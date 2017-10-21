@@ -1,0 +1,81 @@
+{% extends "styled_base.html" %}
+{% block content_area %}
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        var applyFilter = function (high, low) {
+            var resultList = $(".author-list-item");
+            resultList.each(function () {
+                if (($(this).data("recent-year") < $("#year-slider").slider("values", 0)) ||
+                        ($(this).data("recent-year") > $("#year-slider").slider("values", 1))) {
+                    $(this).slideUp("slow");
+                } else if (($(this).data("total-citations") < $("#citation-slider").slider("values", 0)) ||
+                        ($(this).data("total-citations") > $("#citation-slider").slider("values", 1))) {
+                    $(this).slideUp("slow");
+                } else {
+                    $(this).slideDown("slow");
+                }
+            });
+        }
+        $(function () {
+            <!-- Attribute Sliders -->
+            $("#citation-slider").slider({
+                range: true,
+                min: 0,
+                max: {{ max_citations }},
+                values: [0, {{ max_citations }}],
+                slide: function (event, ui) {
+                    $("#citation-range").val("" + ui.values[0] + " - " + ui.values[1]);
+                },
+                change: function (event, ui) {
+                    applyFilter(ui.values[1], ui.values[0]);
+                }
+            });
+            $("#year-slider").slider({
+                range: true,
+                min: 1990,
+                max: 2016,
+                values: [2000, 2016],
+                slide: function (event, ui) {
+                    $("#year-range").val("" + ui.values[0] + " - " + ui.values[1]);
+                },
+                change: function (event, ui) {
+                    applyFilter(ui.values[1], ui.values[0]);
+                }
+            });
+
+            <!-- Slider labels-->
+            $("#year-range").val("" + $("#year-slider").slider("values", 0) +
+                    " - " + $("#year-slider").slider("values", 1));
+            $("#citation-range").val("" + $("#citation-slider").slider("values", 0) +
+                    " - " + $("#citation-slider").slider("values", 1));
+        });
+    </script>
+    <br>
+    <div class="w3-container w3-card-2 w3-theme-d1 w3-round w3-margin"><br>
+            <ul class="w3-center w3-text" style="margin-top: 0%; padding-left:0%; list-style-type: none;">
+                {% for q in query %} <li class="w3-hover-white">{{ q }}</li>{% endfor %}</ul>
+        <!-- Attribute sliders -->
+        <hr class="w3-clear">
+        <div id="slider-container" class="w3-container w3-center" style="width: 85%; margin: 0 auto;">
+            <!-- Number of citations slider-->
+            <label for="citation-range">Total Number of Citations:</label>
+            <input type="text" id="citation-range" readonly
+                   style="background:transparent; border: none; color: white; font-weight:bold;">
+            <div id="citation-slider" class="w3-theme-d1" style="margin: 0 auto;"></div>
+
+            <!-- Publication date slider-->
+            <label for="year-range">Latest Publication Date:</label>
+            <input type="text" id="year-range" readonly
+                   style="background:transparent; border: none; color: white; font-weight:bold;">
+            <div id="year-slider" class="w3-theme-d1"></div>
+        </div>
+
+        <hr class="w3-clear">
+    </div>
+    <div id="all-results">
+        {% for result in results_list %}
+            {% include "subtemplates/author_sub.html" with author=result number=forloop.counter score=result.score year=result.mostRecentYear %}
+        {% endfor %}
+    </div>
+{% endblock %}
