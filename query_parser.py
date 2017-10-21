@@ -5,7 +5,7 @@ import json
 import requests
 
 # API keys
-API_KEY1 = 'd1ec02129efc4f1881d2d1bab395bf934'
+API_KEY1 = 'XXX'
 
 # Analytic API Constants
 KEYPHRASE_URL = "https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases"
